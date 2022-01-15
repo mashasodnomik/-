@@ -1,0 +1,92 @@
+from itertools import chain
+
+class Enrolee:
+    def __init__(self, name, prefer, points):
+        self.prefer = prefer   # список предпочтений от наиб к наим
+        self.points = points
+        self.name = name
+
+
+class Faculty:
+    def __init__(self, name, num_vacant_places):
+        self.num_vacant_places = num_vacant_places   # список бюджетных мест на каждую специальность
+        self.name = name
+
+def stable_matching():
+    for ab in applicants:
+        abit = (ab.name, ab.points)
+        if abit not in list(chain(*passed_studets)):
+            print(abit)
+            pref = list(map(lambda x: f[x], ab.prefer))
+            # ПРИ 259 ОН ИЗМЕНЯЕТ ПРЕФ
+            if abit[1] == 259:
+                print(f'PREF{pref}')
+            pref_copy = pref
+            for pr in pref:
+                if abit not in passed_studets[pr]:
+                    passed_studets[pr].append(abit)
+                    if abit[1] == 259:
+                        print(f"!!!!!!!!!{passed_studets[pr]}")
+                lsl = sorted(passed_studets[pr], key=lambda x: x[1], reverse=True)[:faculties[pr]]
+                lastabit = lsl[-1]
+                lastabitpoints = lastabit[1]
+                if abit not in lsl:
+                    passed_studets[pr].remove(abit)
+                    pref_copy.remove(pr)
+            print(pref_copy)
+            maxs = pref_copy[0]
+            print(maxs)
+            for elem in pref:
+                if abit[1] == 259:
+                    print(elem, maxs, passed_studets[elem])
+                if abit in passed_studets[elem] and maxs != elem:
+                    passed_studets[elem].remove(abit)
+                else:
+                    if abit[1] == 259:
+                        print(passed_studets[elem])
+    for i, elem in enumerate(passed_studets):
+        passed_studets[i] = sorted(elem, key=lambda x: x[1], reverse=True)[:faculties[i]]
+    print(passed_studets)
+
+
+
+
+
+
+
+ab1 = Enrolee("abit1", ["c1", "c3", "c2"], 273)
+ab2 = Enrolee("abit2", ["c2", "c1", "c3"], 242)
+ab3 = Enrolee("abit3", ["c1", "c3", "c2"], 257)
+ab4 = Enrolee("abit4", ["c3", "c2", "c1"], 302)
+ab5 = Enrolee("abit5", ["c1", "c3", "c2"], 264)
+ab6 = Enrolee("abit6", ["c3", "c1", "c2"], 257)
+ab7 = Enrolee("abit7", ["c1", "c3", "c2"], 278)
+ab8 = Enrolee("abit8", ["c3", "c1", "c2"], 298)
+ab9 = Enrolee("abit9", ["c1", "c2", "c3"], 237)
+ab10 = Enrolee("abit10", ["c2", "c3", "c1"], 259)
+ab11 = Enrolee("abit11", ["c2", "c3", "c3"], 278)
+ab12 = Enrolee("abit12", ["c2", "c3", "c1"], 280)
+ab13 = Enrolee("abit13", ["c3", "c2", "c1"], 302)
+ab14 = Enrolee("abit14", ["c3", "c2", "c1"], 300)
+ab15 = Enrolee("abit15", ["c3", "c2", "c1"], 300)
+
+
+applicants = [ab1, ab2, ab3, ab4, ab13, ab5, ab6, ab7, ab14, ab15, ab8, ab9, ab10, ab11, ab12]
+
+fac1 = Faculty("dtg", 3)
+fac2 = Faculty("srf", 1)
+fac3 = Faculty("stts", 8)
+faculties = [fac1.num_vacant_places, fac2.num_vacant_places, fac3.num_vacant_places]
+check = []
+count = 11 # загвоздка
+f = {}
+for i in range(len(faculties)):
+    f[f"c{i + 1}"] = i
+
+passed_studets = [[] for _ in range(len(faculties))]
+
+while count != 0:
+    stable_matching()
+    count = count -1
+
+print(*passed_studets, sep="\n")
