@@ -1,0 +1,75 @@
+from itertools import chain
+import copy
+class Enrolee:
+    def __init__(self, name, prefer, points):
+        self.prefer = prefer   # список предпочтений от наиб к наим
+        self.points = points
+        self.name = name
+
+
+class Faculty:
+    def __init__(self, name, num_vacant_places):
+        self.num_vacant_places = num_vacant_places   # список бюджетных мест на каждую специальность
+        self.name = name
+
+def stable_matching():
+    for ab in applicants:
+        abit = (ab.name, ab.points)
+        if abit not in list(chain(*passed_studets)):
+            print(f"{abit} не прошел никуда")
+            pref = list(map(lambda x: f[x], ab.prefer))
+            pref_copy = pref.copy()
+            for pr in pref:
+                if abit not in passed_studets[pr]:
+                    passed_studets[pr].append(abit)
+                lsl = sorted(passed_studets[pr], key=lambda x: x[1], reverse=True)[:faculties[pr]]
+                lastabit = lsl[-1]
+                lastabitpoints = lastabit[1]
+                if abit not in lsl:
+                    passed_studets[pr].remove(abit)
+                    pref_copy.remove(pr)
+            if len(pref_copy) != 0:
+                maxs = pref_copy[0]
+                for elem in pref:
+                    if abit in passed_studets[elem] and maxs != elem:
+                        passed_studets[elem].remove(abit)
+    for i, elem in enumerate(passed_studets):
+        passed_studets[i] = sorted(elem, key=lambda x: x[1], reverse=True)[:faculties[i]]
+
+
+ab1 = Enrolee("abit1", ["c1", "c3", "c2", "c4"], 273)
+ab2 = Enrolee("abit2", ["c2", "c1", "c3", "c4"], 242)
+ab3 = Enrolee("abit3", ["c1", "c3", "c2", "c4"], 257)
+ab4 = Enrolee("abit4", ["c3", "c2", "c1", "c4"], 302)
+ab5 = Enrolee("abit5", ["c1", "c3", "c2", "c4"], 264)
+ab6 = Enrolee("abit6", ["c3", "c1", "c2", "c4"], 257)
+ab7 = Enrolee("abit7", ["c1", "c3", "c2", "c4"], 278)
+ab8 = Enrolee("abit8", ["c3", "c1", "c2", "c4"], 298)
+ab9 = Enrolee("abit9", ["c1", "c2", "c3", "c4"], 237)
+ab10 = Enrolee("abit10", ["c2", "c3", "c1", "c4"], 259)
+ab11 = Enrolee("abit11", ["c2", "c3", "c3", "c4"], 278)
+ab12 = Enrolee("abit12", ["c2", "c3", "c1", "c4"], 280)
+ab13 = Enrolee("abit13", ["c3", "c2", "c1", "c4"], 302)
+ab14 = Enrolee("abit14", ["c3", "c2", "c1", "c4"], 300)
+ab15 = Enrolee("abit15", ["c3", "c2", "c1", "c4"], 300)
+
+
+applicants = [ab1, ab2, ab3, ab4, ab13, ab5, ab6, ab7, ab14, ab15, ab8, ab9, ab10, ab11, ab12]
+
+fac1 = Faculty("dtg", 3)
+fac2 = Faculty("srf", 1)
+fac3 = Faculty("stts", 8)
+unpassed_places = len(applicants) - fac1.num_vacant_places - fac2.num_vacant_places - fac3.num_vacant_places
+unpassed = Faculty("you didnt pass im sorry", unpassed_places)
+faculties = [fac1.num_vacant_places, fac2.num_vacant_places, fac3.num_vacant_places, unpassed.num_vacant_places]
+check = []
+
+f = {}
+for i in range(len(faculties)):
+    f[f"c{i + 1}"] = i
+
+passed_studets = [[] for _ in range(len(faculties))]
+for i in range(len(applicants)**2 ):
+    stable_matching()
+
+print(*passed_studets, sep="\n")
